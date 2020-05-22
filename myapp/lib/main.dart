@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       },
       // home: MyHomePage(title: 'Flutter Demo Home Page'),
       // home: CounterWidget(initValue: 1),
-      home: LayoutWidget(),
+      home: WrapTestRoute(),
     );
   }
 }
@@ -667,6 +667,109 @@ class LayoutWidget extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// 弹性布局
+
+class FlexLayoutTestRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.only(top: 100),
+      child: Column(
+      children: <Widget>[
+        Flex(
+          direction: Axis.horizontal,
+          children: <Widget>[
+            Expanded(
+              flex: 1,
+              child: Container(
+                height: 30,
+                color: Colors.red,
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Container(
+                height: 30,
+                color: Colors.green,
+              ),
+            )
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 20),
+          child: SizedBox(
+            height: 100,
+            child: Flex(
+              direction: Axis.vertical,
+              children: <Widget>[
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    height: 30,
+                    color: Colors.red,
+                  ),
+                ),
+                Spacer(
+                  flex: 1,
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    height: 30,
+                    color: Colors.green,
+                  ),
+                )
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+
+  }
+}
+
+// 流式布局
+class WrapTestRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Wrap 流式布局"),
+      ),
+      body: Container(
+      padding: EdgeInsets.only(left: 10),
+      color: Colors.white,
+      child: Wrap(
+        spacing: 8,
+        runSpacing: -5,
+        alignment: WrapAlignment.start,
+        children: <Widget>[
+          new Chip(
+            avatar: CircleAvatar(backgroundColor: Colors.blue, child: Text("A")),
+            label: Text("Hamilton"),
+          ),
+          new Chip(
+            avatar: CircleAvatar(backgroundColor: Colors.blue, child: Text("B")),
+            label: Text("Lafayette"),
+          ),
+          new Chip(
+            avatar: CircleAvatar(backgroundColor: Colors.blue, child: Text("C")),
+            label: Text("Mulligan"),
+          ),
+          new Chip(
+            avatar: CircleAvatar(backgroundColor: Colors.blue, child: Text("D")),
+            label: Text("Laurens"),
+          ),
+        ],
+      ),
+    ),
     );
   }
 }
