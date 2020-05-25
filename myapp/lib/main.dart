@@ -35,7 +35,8 @@ class MyApp extends StatelessWidget {
       },
       // home: MyHomePage(title: 'Flutter Demo Home Page'),
       // home: CounterWidget(initValue: 1),
-      home: WrapTestRoute(),
+      // home: WrapTestRoute(),
+      home: ScaffoldRoute(),
     );
   }
 }
@@ -772,4 +773,149 @@ class WrapTestRoute extends StatelessWidget {
     ),
     );
   }
+}
+
+// 尺寸限制类容器
+class BoxTestRoute extends StatelessWidget {
+
+  Widget redBox = DecoratedBox(
+    decoration: BoxDecoration(color: Colors.red),
+  );
+
+  Widget blueBox = DecoratedBox(
+    decoration: BoxDecoration(color: Colors.blue),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    // return ConstrainedBox(
+    //   constraints: BoxConstraints(maxWidth: 90, maxHeight: 20),
+    //   child: ConstrainedBox(
+    //     constraints: BoxConstraints(maxWidth: 60, maxHeight: 60),
+    //     child: redBox,
+    //   ),
+    // );
+    return Scaffold(
+            // backgroundColor: Colors.white,
+            body: Container(
+              padding: EdgeInsets.only(top: 100, left: 100),
+              child: Column(
+                children: <Widget>[
+                  //多重限制时，对于minWidth和minHeight来说，是取父子中相应数值较大的。
+                  ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: 100.0,minWidth: 60.0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: 80.0,minWidth: 80.0),
+                      child: Padding(padding: EdgeInsets.only(top: 10.0),child: redBox,),
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: 80.0,minWidth: 80.0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: 100.0,minWidth: 60.0),
+                      child: Padding(padding: EdgeInsets.only(top: 10.0),child: redBox,),
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: 100.0,maxWidth: 60.0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: 80.0,maxWidth: 80.0),
+                      child: Padding(padding: EdgeInsets.only(top: 10.0),child: blueBox,),
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: 80.0,maxWidth: 80.0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: 100.0,maxWidth: 60.0),
+                      child: Padding(padding: EdgeInsets.only(top: 10.0),child: blueBox,),
+                    ),
+                  ),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [Colors.red, Colors.orange[700]]),
+                      borderRadius: BorderRadius.circular(3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black45,
+                          offset: Offset(2.0, 2.0),
+                          blurRadius: 4.0
+                        )
+                      ]
+                    ),
+                    child: Padding(padding: EdgeInsets.symmetric(horizontal: 80, vertical: 18),
+                      child: Text("Login", style: TextStyle(color: Colors.white),),
+                    ),
+                  ),
+                ],
+              ),
+            )
+        );
+  }
+}
+
+class BoxTestRoute2 extends StatelessWidget {
+
+  Widget redBox = DecoratedBox(
+    decoration: BoxDecoration(color: Colors.red),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.only(top: 0, left: 0),
+      width: 100,
+      height: 100,
+      child: redBox,
+    );
+  }
+}
+
+// Scaffold
+
+class ScaffoldRoute extends StatefulWidget {
+  @override
+  _ScaffoldRouteState createState() => _ScaffoldRouteState();
+}
+
+class _ScaffoldRouteState extends State<ScaffoldRoute> {
+  int _selectedIndex = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("App name"),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.share), onPressed: (){}),
+        ],
+      ),
+      drawer: new Drawer(),
+      bottomNavigationBar: BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), title: Text("Home")),
+          BottomNavigationBarItem(icon: Icon(Icons.business), title: Text("Business")),
+          BottomNavigationBarItem(icon: Icon(Icons.school), title: Text("School")),
+        ],
+        currentIndex: _selectedIndex,
+        fixedColor: Colors.blue,
+        onTap: _onItemTapped,
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: _onAdd,
+      ),
+    );
+  }
+  
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  void _onAdd(){
+    debugPrint("add");
+  }
+
 }
