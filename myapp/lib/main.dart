@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       // home: MyHomePage(title: 'Flutter Demo Home Page'),
       // home: CounterWidget(initValue: 1),
       // home: WrapTestRoute(),
-      home: ScaffoldRoute(),
+      home: ScrollNotificationTestRoute(),
     );
   }
 }
@@ -918,4 +918,264 @@ class _ScaffoldRouteState extends State<ScaffoldRoute> {
     debugPrint("add");
   }
 
+}
+
+// 可滚动组件
+class SingleChildScrollViewTestRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    String str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    return Scrollbar(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Center(
+          child: Column(
+            children: str.split("").map((c) => Text(c)).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ListView3 extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    Widget divider1 =Divider(color: Colors.blue);
+    Widget divider2 =Divider(color: Colors.green,);
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("ListView3"),
+      ),
+      body: ListView.separated(
+        itemCount: 100,
+        itemBuilder: (BuildContext context, int index) {
+          return ListTile(title: Text("$index"),);
+        },
+        separatorBuilder: (BuildContext context, int index) {
+          return index%2 == 0 ? divider1 : divider2;
+        },
+      ),
+    );
+  }
+}
+
+class InfiniteListView extends StatefulWidget {
+  @override
+  _InfiniteListViewState createState() => _InfiniteListViewState();
+}
+
+class _InfiniteListViewState extends State<InfiniteListView> {
+  static const loadingTag = "##loading##";
+  var _words = <String>[loadingTag];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _retrieveData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: ListView.separated(
+      itemCount: _words.length,
+      itemBuilder: (context, index) {
+        if (_words[index] == loadingTag) {
+          if (_words.length - 1 < 100) {
+            _retrieveData();
+            return Container(
+              padding: const EdgeInsets.all(16),
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2,),
+              ),
+            );
+          } else {
+            return Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.all(16),
+              child: Text("没有更多了", style: TextStyle(color: Colors.grey),),
+            );
+          }
+        }
+        return ListTile(title: Text(_words[index]),);
+      },
+      separatorBuilder: (context, index) => Divider(height: .0,),
+    ),
+    );
+  }
+
+  void _retrieveData() {
+    Future.delayed(Duration(seconds: 2)).then((e) {
+      setState(() {
+        //重新构建列表
+        _words.insertAll(_words.length - 1,
+          //每次生成20个单词
+          generateWordPairs().take(20).map((e) => e.asPascalCase).toList()
+          );
+      });
+    });
+  }
+
+}
+
+class CustomScrollViewTestRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      child: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            pinned: true,
+            expandedHeight: 250,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text("Demo"),
+              background: Image.asset("img/cat.jpg", fit: BoxFit.cover,),
+            ),
+          ),
+          SliverPadding(
+            padding: EdgeInsets.all(8),
+            sliver: SliverGrid(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                childAspectRatio: 4,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  return Container(
+                    alignment: Alignment.center,
+                    color: Colors.cyan[100 * (index % 9)],
+                    child: Text("grid item $index"),
+                  );
+                },
+                childCount: 20,
+              ),
+            ),
+          ),
+          SliverFixedExtentList(
+            itemExtent: 50,
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                return Container(
+                  alignment: Alignment.center,
+                  color: Colors.lightBlue[100 * (index % 9)],
+                  child: Text("list item $index"),
+                );
+              },
+              childCount: 50,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ScrollControllerTestRoute extends StatefulWidget {
+  @override
+  _ScrollControllerTestRouteState createState() => _ScrollControllerTestRouteState();
+}
+
+class _ScrollControllerTestRouteState extends State<ScrollControllerTestRoute> {
+  ScrollController _controller = ScrollController();
+  bool showToTopBtn = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller.addListener((){
+      print(_controller.offset);
+      if (_controller.offset < 1000 && showToTopBtn) {
+        setState(() {
+          showToTopBtn = false;
+        });
+      } else if (_controller.offset >= 1000 && showToTopBtn == false) {
+        setState(() {
+          showToTopBtn = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("滚动控制"),),
+      body: Scrollbar(
+        child: ListView.builder(
+          itemCount: 100,
+          itemExtent: 50,
+          controller: _controller,
+          itemBuilder: (context, index) {
+            return ListTile(title: Text("$index"),);
+          },
+        ),
+      ),
+      floatingActionButton: !showToTopBtn ? null : FloatingActionButton(
+        child: Icon(Icons.arrow_upward),
+        onPressed: (){
+          _controller.animateTo(.0, duration: Duration(milliseconds: 200), curve: Curves.ease);
+        },
+      ),
+    );
+  }
+}
+
+class ScrollNotificationTestRoute extends StatefulWidget {
+  @override
+  _ScrollNotificationTestRouteState createState() => _ScrollNotificationTestRouteState();
+}
+
+class _ScrollNotificationTestRouteState extends State<ScrollNotificationTestRoute> {
+  String _progress = "0%";
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      child: Scrollbar(
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (ScrollNotification notification){
+            double progress = notification.metrics.pixels / notification.metrics.maxScrollExtent;
+            setState((){
+              _progress = "${(progress * 100).toInt()}%";
+            });
+            print("BottomEdge: ${notification.metrics.extentAfter == 0}");
+            return true;
+          },
+          child: Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              ListView.builder(
+                itemCount: 100,
+                itemExtent: 50,
+                itemBuilder: (context, index) {
+                  return ListTile(title: Text("$index"),);
+                },
+              ),
+              CircleAvatar(
+                radius: 30,
+                child: Text(_progress),
+                backgroundColor: Colors.black54,
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
